@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@radar/lnrpc": "^0.11.1-beta.1",
     "bootswatch": "^4.5.2",
     "cors": "^2.8.5",
     "express": "^4.17.1",

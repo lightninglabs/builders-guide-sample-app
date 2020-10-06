@@ -16,6 +16,7 @@ export class Store {
   // App state
   page = 'posts';
   error = '';
+  connected = false;
 
   // PostList state
   posts: Post[] = [];
@@ -39,6 +40,7 @@ export class Store {
 
   gotoPosts = () => (this.page = 'posts');
   gotoCreate = () => (this.page = 'create');
+  gotoConnect = () => (this.page = 'connect');
 
   clearError = () => (this.error = '');
 
@@ -49,6 +51,22 @@ export class Store {
     // connect to the backend WebSocket and listen for events
     const ws = api.getEventsSocket();
     ws.addEventListener('message', this.onSocketMessage);
+  };
+
+  connectToLnd = async (host: string, cert: string, macaroon: string) => {
+    this.clearError();
+    try {
+      await api.connect(host, cert, macaroon);
+      this.connected = true;
+      this.gotoPosts();
+    } catch (err) {
+      this.error = err.message;
+    }
+  };
+
+  disconnect = () => {
+    api.clearToken();
+    this.connected = false;
   };
 
   fetchPosts = async () => {
@@ -101,7 +119,7 @@ export class Store {
       // the updated post
       post,
       // the existing posts excluding the one that was updated
-      ...this.posts.filter((p) => p.id !== post.id),
+      ...this.posts.filter(p => p.id !== post.id),
     ];
   };
 }

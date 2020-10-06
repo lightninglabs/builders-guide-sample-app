@@ -3,6 +3,14 @@
 //
 const API_URL = 'http://localhost:4000/api';
 const WS_URL = 'ws://localhost:4000/api/events';
+const TOKEN_KEY = 'token';
+
+//
+// token persistent storage
+//
+export const getToken = () => sessionStorage.getItem(TOKEN_KEY) || '';
+export const setToken = (value: string) => sessionStorage.setItem(TOKEN_KEY, value);
+export const clearToken = () => sessionStorage.removeItem(TOKEN_KEY);
 
 //
 // Shared fetch wrapper funcs
@@ -14,6 +22,8 @@ const httpGet = async (path: string) => {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
+      // add the token from localStorage into every request
+      'X-Token': getToken(),
     },
   });
   const json = await response.json();
@@ -29,6 +39,8 @@ const httpPost = async (path: string, data: Record<string, any> = {}) => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      // add the token from localStorage into every request
+      'X-Token': getToken(),
     },
     body: JSON.stringify(data),
   });
@@ -48,15 +60,18 @@ export const getEventsSocket = () => {
   return new WebSocket(WS_URL);
 };
 
+export const connect = async (host: string, cert: string, macaroon: string) => {
+  const request = { host, cert, macaroon };
+  const { token } = await httpPost('connect', request);
+  // save the token into the browser's storage
+  setToken(token);
+};
+
 export const fetchPosts = async () => {
   return await httpGet('posts');
 };
 
-export const createPost = async (
-  username: string,
-  title: string,
-  content: string
-) => {
+export const createPost = async (username: string, title: string, content: string) => {
   const request = { username, title, content };
   return await httpPost('posts', request);
 };
