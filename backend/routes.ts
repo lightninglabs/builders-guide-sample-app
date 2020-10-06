@@ -13,6 +13,23 @@ export const connect = async (req: Request, res: Response) => {
 };
 
 /**
+ * GET /api/info
+ */
+export const getInfo = async (req: Request, res: Response) => {
+  const { token } = req.body;
+  if (!token) throw new Error('Your node is not connected!');
+  // find the node that's making the request
+  const node = db.getNodeByToken(token);
+  if (!node) throw new Error('Node not found with this token');
+
+  // get the node's pubkey and alias
+  const rpc = nodeManager.getRpc(node.token);
+  const { alias, identityPubkey: pubkey } = await rpc.getInfo();
+  const { balance } = await rpc.channelBalance();
+  res.send({ alias, balance, pubkey });
+};
+
+/**
  * GET /api/posts
  */
 export const getPosts = (req: Request, res: Response) => {

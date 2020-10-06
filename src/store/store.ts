@@ -17,6 +17,9 @@ export class Store {
   page = 'posts';
   error = '';
   connected = false;
+  alias = '';
+  balance = 0;
+  pubkey = '';
 
   // PostList state
   posts: Post[] = [];
@@ -45,8 +48,21 @@ export class Store {
   clearError = () => (this.error = '');
 
   init = async () => {
+    // try to fetch the node's info on startup
+    try {
+      await this.fetchInfo();
+      this.connected = true;
+    } catch (err) {
+      // don't display an error, just disconnect
+      this.connected = false;
+    }
+
     // fetch the posts from the backend
-    this.fetchPosts();
+    try {
+      this.posts = await api.fetchPosts();
+    } catch (err) {
+      this.error = err.message;
+    }
 
     // connect to the backend WebSocket and listen for events
     const ws = api.getEventsSocket();
@@ -58,6 +74,7 @@ export class Store {
     try {
       await api.connect(host, cert, macaroon);
       this.connected = true;
+      this.fetchInfo();
       this.gotoPosts();
     } catch (err) {
       this.error = err.message;
@@ -67,6 +84,13 @@ export class Store {
   disconnect = () => {
     api.clearToken();
     this.connected = false;
+  };
+
+  fetchInfo = async () => {
+    const info = await api.getInfo();
+    this.alias = info.alias;
+    this.balance = parseInt(info.balance);
+    this.pubkey = info.pubkey;
   };
 
   fetchPosts = async () => {

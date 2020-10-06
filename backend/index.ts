@@ -47,6 +47,7 @@ export const catchAsyncErrors = (
 // Configure Routes
 //
 app.post('/api/connect', catchAsyncErrors(routes.connect));
+app.get('/api/info', catchAsyncErrors(routes.getInfo));
 app.get('/api/posts', catchAsyncErrors(routes.getPosts));
 app.post('/api/posts', catchAsyncErrors(routes.createPost));
 app.post('/api/posts/:id/upvote', catchAsyncErrors(routes.upvotePost));

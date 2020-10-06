@@ -40,6 +40,9 @@ class NodeManager extends EventEmitter {
       // verify we have permission get node info
       const { identityPubkey: pubkey } = await rpc.getInfo();
 
+      // verify we have permission to get channel balances
+      await rpc.channelBalance();
+
       // store this rpc connection in the in-memory list
       this._lndNodes[token] = rpc;
 

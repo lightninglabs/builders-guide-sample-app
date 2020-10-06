@@ -67,6 +67,10 @@ export const connect = async (host: string, cert: string, macaroon: string) => {
   setToken(token);
 };
 
+export const getInfo = async () => {
+  return await httpGet('info');
+};
+
 export const fetchPosts = async () => {
   return await httpGet('posts');
 };
