@@ -1,0 +1,8 @@
+{
+  "short_name": "Builders Guide",
+  "name": "Builders Guide to the LND Galaxy",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
