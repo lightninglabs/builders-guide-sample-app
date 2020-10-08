@@ -11,4 +11,5 @@ export interface Post {
 
 export const SocketEvents = {
   postUpdated: 'post-updated',
+  invoicePaid: 'invoice-paid',
 };

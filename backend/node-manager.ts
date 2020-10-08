@@ -3,6 +3,10 @@ import { EventEmitter } from 'events';
 import { v4 as uuidv4 } from 'uuid';
 import { LndNode } from './posts-db';
 
+export const NodeEvents = {
+  invoicePaid: 'invoice-paid',
+};
+
 class NodeManager extends EventEmitter {
   /**
    * a mapping of token to gRPC connection. This is an optimization to
@@ -50,6 +54,15 @@ class NodeManager extends EventEmitter {
       // verify we have permission to verify a message
       await rpc.verifyMessage({ msg, signature });
 
+      // verify we have permissions to create a 1sat invoice
+      const { rHash } = await rpc.addInvoice({ value: '1' });
+
+      // verify we have permission to lookup invoices
+      await rpc.lookupInvoice({ rHash });
+
+      // listen for payments from LND
+      this.listenForPayments(rpc, pubkey);
+
       // store this rpc connection in the in-memory list
       this._lndNodes[token] = rpc;
 
@@ -79,6 +92,21 @@ class NodeManager extends EventEmitter {
         console.error(`Failed to reconnect to LND node ${host} with token: ${token}`);
       }
     }
+  }
+
+  /**
+   * listen for payments made to the node. When a payment is settled, emit
+   * the `invoicePaid` event to notify listeners of the NodeManager
+   */
+  listenForPayments(rpc: LnRpc, pubkey: string) {
+    const stream = rpc.subscribeInvoices();
+    stream.on('data', invoice => {
+      if (invoice.settled) {
+        const hash = (invoice.rHash as Buffer).toString('base64');
+        const amount = invoice.amtPaidSat;
+        this.emit(NodeEvents.invoicePaid, { hash, amount, pubkey });
+      }
+    });
   }
 }
 

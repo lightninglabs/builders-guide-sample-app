@@ -121,12 +121,14 @@ export class Store {
     }
   };
 
-  upvotePost = async (post: Post) => {
-    this.clearError();
+  upvotePost = async () => {
+    this.pmtError = '';
     try {
-      await api.upvotePost(post.id);
+      if (!this.pmtForPost) throw new Error('No post selected to upvote');
+      await api.upvotePost(this.pmtForPost.id, this.pmtHash);
+      this.pmtSuccessMsg = `Your payment of ${this.pmtAmount} sats to ${this.pmtForPost.username} was successful! The post has been upvoted!`;
     } catch (err) {
-      this.error = err.message;
+      this.pmtError = err.message;
     }
   };
 
@@ -176,6 +178,14 @@ export class Store {
     if (event.type === SocketEvents.postUpdated) {
       // replacing the existing post with this new one
       this._updatePost(event.data);
+    }
+    if (event.type === SocketEvents.invoicePaid) {
+      const { hash } = event.data;
+      // upvote the post when the incoming payment is made for the
+      // pmtHash the we are waiting for
+      if (hash === this.pmtHash) {
+        this.upvotePost();
+      }
     }
   };
 

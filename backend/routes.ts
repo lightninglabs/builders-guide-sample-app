@@ -59,9 +59,23 @@ export const createPost = async (req: Request, res: Response) => {
  */
 export const upvotePost = async (req: Request, res: Response) => {
   const { id } = req.params;
+  const { hash } = req.body;
+
+  // validate that a invoice hash was provided
+  if (!hash) throw new Error('hash is required');
   // find the post
   const post = db.getPostById(parseInt(id));
   if (!post) throw new Error('Post not found');
+  // find the node that made this post
+  const node = db.getNodeByPubkey(post.pubkey);
+  if (!node) throw new Error('Node not found for this post');
+
+  const rpc = nodeManager.getRpc(node.token);
+  const rHash = Buffer.from(hash, 'base64');
+  const { settled } = await rpc.lookupInvoice({ rHash });
+  if (!settled) {
+    throw new Error('The payment has not been paid yet!');
+  }
 
   db.upvotePost(post.id);
   res.send(post);
