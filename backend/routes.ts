@@ -95,3 +95,26 @@ export const verifyPost = async (req: Request, res: Response) => {
   db.verifyPost(post.id);
   res.send(post);
 };
+
+/**
+ * POST /api/posts/:id/invoice
+ */
+export const postInvoice = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  // find the post
+  const post = db.getPostById(parseInt(id));
+  if (!post) throw new Error('Post not found');
+  // find the node that made this post
+  const node = db.getNodeByPubkey(post.pubkey);
+  if (!node) throw new Error('Node not found for this post');
+
+  // create an invoice on the poster's node
+  const rpc = nodeManager.getRpc(node.token);
+  const amount = 100;
+  const inv = await rpc.addInvoice({ value: amount.toString() });
+  res.send({
+    payreq: inv.paymentRequest,
+    hash: (inv.rHash as Buffer).toString('base64'),
+    amount,
+  });
+};

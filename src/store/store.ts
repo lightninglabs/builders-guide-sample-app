@@ -24,6 +24,15 @@ export class Store {
   // PostList state
   posts: Post[] = [];
 
+  // PayModal state
+  showPayModal = false;
+  pmtForPost: Post | undefined;
+  pmtAmount = '';
+  pmtRequest = '';
+  pmtHash = '';
+  pmtSuccessMsg = '';
+  pmtError = '';
+
   //
   // Computed props
   //
@@ -129,6 +138,32 @@ export class Store {
     } catch (err) {
       this.error = err.message;
     }
+  };
+
+  showPaymentRequest = async (post: Post) => {
+    this.clearError();
+    try {
+      const res = await api.createInvoice(post.id);
+      this.pmtForPost = post;
+      this.pmtAmount = res.amount;
+      this.pmtRequest = res.payreq;
+      this.pmtHash = res.hash;
+      this.pmtSuccessMsg = '';
+      this.pmtError = '';
+      this.showPayModal = true;
+    } catch (err) {
+      this.error = err.message;
+    }
+  };
+
+  hidePaymentRequest = () => {
+    this.pmtForPost = undefined;
+    this.pmtAmount = '';
+    this.pmtRequest = '';
+    this.pmtHash = '';
+    this.pmtSuccessMsg = '';
+    this.pmtError = '';
+    this.showPayModal = false;
   };
 
   //

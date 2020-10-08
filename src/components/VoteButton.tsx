@@ -10,8 +10,9 @@ interface Props {
 const VoteButton: React.FC<Props> = ({ post }) => {
   const store = useStore();
 
+  // create an invoice and show the modal when the button is clicked
   const handleUpvoteClick = useCallback(async () => {
-    await store.upvotePost(post);
+    await store.showPaymentRequest(post);
   }, [store, post]);
 
   return (

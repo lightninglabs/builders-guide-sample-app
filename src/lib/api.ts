@@ -80,6 +80,10 @@ export const createPost = async (title: string, content: string) => {
   return await httpPost('posts', request);
 };
 
+export const createInvoice = async (postId: number) => {
+  return await httpPost(`posts/${postId}/invoice`);
+};
+
 export const upvotePost = async (postId: number) => {
   return await httpPost(`posts/${postId}/upvote`);
 };
