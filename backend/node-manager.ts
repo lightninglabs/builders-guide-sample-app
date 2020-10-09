@@ -43,6 +43,13 @@ class NodeManager extends EventEmitter {
       // verify we have permission to get channel balances
       await rpc.channelBalance();
 
+      // verify we can sign a message
+      const msg = Buffer.from('authorization test').toString('base64');
+      const { signature } = await rpc.signMessage({ msg });
+
+      // verify we have permission to verify a message
+      await rpc.verifyMessage({ msg, signature });
+
       // store this rpc connection in the in-memory list
       this._lndNodes[token] = rpc;
 

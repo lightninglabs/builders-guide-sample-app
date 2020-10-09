@@ -6,6 +6,7 @@ export interface Post {
   votes: number;
   signature: string;
   pubkey: string;
+  verified: boolean;
 }
 
 export const SocketEvents = {

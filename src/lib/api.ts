@@ -83,3 +83,7 @@ export const createPost = async (title: string, content: string) => {
 export const upvotePost = async (postId: number) => {
   return await httpPost(`posts/${postId}/upvote`);
 };
+
+export const verifyPost = async (postId: number) => {
+  return await httpPost(`posts/${postId}/verify`);
+};

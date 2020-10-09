@@ -64,6 +64,7 @@ class PostsDb extends EventEmitter {
       votes: 0,
       signature,
       pubkey,
+      verified: false,
     };
     this._data.posts.push(post);
 
@@ -78,6 +79,16 @@ class PostsDb extends EventEmitter {
       throw new Error('Post not found');
     }
     post.votes++;
+    await this.persist();
+    this.emit(PostEvents.updated, post);
+  }
+
+  async verifyPost(postId: number) {
+    const post = this._data.posts.find(p => p.id === postId);
+    if (!post) {
+      throw new Error('Post not found');
+    }
+    post.verified = true;
     await this.persist();
     this.emit(PostEvents.updated, post);
   }

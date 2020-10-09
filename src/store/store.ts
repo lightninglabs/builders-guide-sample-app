@@ -42,7 +42,7 @@ export class Store {
   //
 
   gotoPosts = () => (this.page = 'posts');
-  gotoCreate = () => (this.page = 'create');
+  gotoCreate = () => (this.page = this.connected ? 'create' : 'connect');
   gotoConnect = () => (this.page = 'connect');
 
   clearError = () => (this.error = '');
@@ -116,6 +116,16 @@ export class Store {
     this.clearError();
     try {
       await api.upvotePost(post.id);
+    } catch (err) {
+      this.error = err.message;
+    }
+  };
+
+  verifyPost = async (postId: number) => {
+    this.clearError();
+    try {
+      const post = await api.verifyPost(postId);
+      this._updatePost(post);
     } catch (err) {
       this.error = err.message;
     }
