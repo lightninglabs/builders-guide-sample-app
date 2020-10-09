@@ -41,9 +41,12 @@ export const getPosts = (req: Request, res: Response) => {
  * POST /api/posts
  */
 export const createPost = async (req: Request, res: Response) => {
-  const { username, title, content } = req.body;
+  const { token, title, content } = req.body;
+  const rpc = nodeManager.getRpc(token);
 
-  const post = await db.createPost(username, title, content);
+  const { alias } = await rpc.getInfo();
+
+  const post = await db.createPost(alias, title, content);
   res.status(201).send(post);
 };
 

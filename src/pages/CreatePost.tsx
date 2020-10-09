@@ -6,16 +6,15 @@ import { useStore } from '../store/Provider';
 const CreatePost: React.FC = () => {
   const store = useStore();
 
-  const [username, setUsername] = useState('');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLElement>) => {
       e.preventDefault();
-      store.createPost(username, title, content);
+      store.createPost(title, content);
     },
-    [username, title, content, store]
+    [title, content, store],
   );
 
   return (
@@ -24,19 +23,11 @@ const CreatePost: React.FC = () => {
         <Card.Header>Create a new Post</Card.Header>
         <Card.Body>
           <Form.Group controlId="title">
-            <Form.Label>Username</Form.Label>
-            <Form.Control
-              required
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </Form.Group>
-          <Form.Group controlId="title">
             <Form.Label>Title</Form.Label>
             <Form.Control
               required
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={e => setTitle(e.target.value)}
             />
           </Form.Group>
           <Form.Group controlId="title">
@@ -46,7 +37,7 @@ const CreatePost: React.FC = () => {
               as="textarea"
               rows={8}
               value={content}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={e => setContent(e.target.value)}
             />
           </Form.Group>
         </Card.Body>

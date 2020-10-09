@@ -102,10 +102,10 @@ export class Store {
     }
   };
 
-  createPost = async (username: string, title: string, content: string) => {
+  createPost = async (title: string, content: string) => {
     this.clearError();
     try {
-      await api.createPost(username, title, content);
+      await api.createPost(title, content);
       this.gotoPosts();
     } catch (err) {
       this.error = err.message;

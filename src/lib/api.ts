@@ -75,8 +75,8 @@ export const fetchPosts = async () => {
   return await httpGet('posts');
 };
 
-export const createPost = async (username: string, title: string, content: string) => {
-  const request = { username, title, content };
+export const createPost = async (title: string, content: string) => {
+  const request = { title, content };
   return await httpPost('posts', request);
 };
 
