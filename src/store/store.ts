@@ -20,6 +20,7 @@ export class Store {
   alias = '';
   balance = 0;
   pubkey = '';
+  makeItRain = false;
 
   // PostList state
   posts: Post[] = [];
@@ -180,11 +181,15 @@ export class Store {
       this._updatePost(event.data);
     }
     if (event.type === SocketEvents.invoicePaid) {
-      const { hash } = event.data;
+      const { hash, amount, pubkey } = event.data;
       // upvote the post when the incoming payment is made for the
       // pmtHash the we are waiting for
       if (hash === this.pmtHash) {
         this.upvotePost();
+      }
+      // update the balance when an invoice is paid to the current user
+      if (pubkey === this.pubkey) {
+        this._incrementBalance(parseInt(amount));
       }
     }
   };
@@ -192,6 +197,15 @@ export class Store {
   //
   // Private helper methods
   //
+  private _incrementBalance = (amount: number) => {
+    this.balance = this.balance + amount;
+
+    // make it rain for 3 seconds 💸
+    this.makeItRain = true;
+    setTimeout(() => {
+      this.makeItRain = false;
+    }, 3000);
+  };
 
   private _updatePost = (post: Post) => {
     this.posts = [

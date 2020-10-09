@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import { Alert, Badge, Container, Dropdown, Nav, Navbar, NavLink } from 'react-bootstrap';
+import Confetti from 'react-confetti';
 import { observer } from 'mobx-react-lite';
 import Connect from './pages/Connect';
 import CreatePost from './pages/CreatePost';
@@ -57,6 +58,7 @@ function App() {
           {pages[store.page]}
         </div>
       </Container>
+      <Confetti numberOfPieces={store.makeItRain ? 1000 : 0} />
     </>
   );
 }
