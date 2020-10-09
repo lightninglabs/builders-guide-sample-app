@@ -44,9 +44,13 @@ export const createPost = async (req: Request, res: Response) => {
   const { token, title, content } = req.body;
   const rpc = nodeManager.getRpc(token);
 
-  const { alias } = await rpc.getInfo();
+  const { alias, identityPubkey: pubkey } = await rpc.getInfo();
+  // lnd requires the message to sign to be base64 encoded
+  const msg = Buffer.from(content).toString('base64');
+  // sign the message to obtain a signature
+  const { signature } = await rpc.signMessage({ msg });
 
-  const post = await db.createPost(alias, title, content);
+  const post = await db.createPost(alias, title, content, signature, pubkey);
   res.status(201).send(post);
 };
 

@@ -46,7 +46,13 @@ class PostsDb extends EventEmitter {
     return this.getAllPosts().find(post => post.id === id);
   }
 
-  async createPost(username: string, title: string, content: string) {
+  async createPost(
+    username: string,
+    title: string,
+    content: string,
+    signature: string,
+    pubkey: string,
+  ) {
     // calculate the highest numeric id
     const maxId = Math.max(0, ...this._data.posts.map(p => p.id));
 
@@ -56,6 +62,8 @@ class PostsDb extends EventEmitter {
       content,
       username,
       votes: 0,
+      signature,
+      pubkey,
     };
     this._data.posts.push(post);
 
